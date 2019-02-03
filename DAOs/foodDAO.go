@@ -2,8 +2,8 @@ package DAOs
 
 import (
 	"context"
+	"fmt"
 	"github.com/mongodb/mongo-go-driver/bson"
-	"github.com/mongodb/mongo-go-driver/bson/primitive"
 	"go-app/config"
 	"go-app/models"
 	"time"
@@ -31,13 +31,14 @@ func (uDAO *FoodDAO) AddFood(food models.Food) (id interface{}, err error){
 	return
 }
 
-func (uDAO *FoodDAO) RemoveFood(_id primitive.ObjectID) (err error){
+func (uDAO *FoodDAO) RemoveFood(_id string) (err error){
 	uDAO.config = config.Config{}
 	db, err := uDAO.config.Connect()
 	if err != nil {
 		return
 	}
 
+	fmt.Println(_id)
 	filter := bson.M{"_id": _id}
 	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
 	db.Collection(uDAO.Collection).FindOneAndDelete(ctx,filter)

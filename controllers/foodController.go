@@ -12,7 +12,7 @@ type FoodController struct {
 
 func (u *FoodController) AddFood(food models.Food) (interface{}, error){
 	u.dao = DAOs.FoodDAO{Collection: "foods"}
-	food.Id = primitive.NewObjectID()
+	food.Id = primitive.NewObjectID().String()
 	return u.dao.AddFood(food)
 }
 
