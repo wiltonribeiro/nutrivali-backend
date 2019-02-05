@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"github.com/mongodb/mongo-go-driver/bson/primitive"
 	"go-app/DAOs"
 	"go-app/models"
 )
@@ -12,7 +11,6 @@ type FoodController struct {
 
 func (u *FoodController) AddFood(food models.Food) (interface{}, error){
 	u.dao = DAOs.FoodDAO{Collection: "foods"}
-	food.Id = primitive.NewObjectID().String()
 	return u.dao.AddFood(food)
 }
 
@@ -38,7 +36,7 @@ func (u *FoodController) UpdateFood(food models.Food) error{
 
 func (u *FoodController) RemoveFood(food models.Food) error{
 	u.dao = DAOs.FoodDAO{Collection: "foods"}
-	return u.dao.RemoveFood(food.Id)
+	return u.dao.RemoveFood(food)
 }
 
 

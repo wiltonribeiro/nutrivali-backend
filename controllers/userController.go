@@ -24,6 +24,11 @@ func (u *UserController) GetUserById(uid string) (models.User, error){
 	return u.dao.GetUserById(uid)
 }
 
+func (u *UserController) UpdateToken(user models.User) error{
+	u.dao = DAOs.UserDAO{Collection: "users"}
+	return u.dao.UpdateUserToken(user)
+}
+
 func (u *UserController) RemoveUser() {
 	//TODO
 }

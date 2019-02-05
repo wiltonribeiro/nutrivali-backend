@@ -2,7 +2,6 @@ package DAOs
 
 import (
 	"context"
-	"fmt"
 	"github.com/mongodb/mongo-go-driver/bson"
 	"go-app/config"
 	"go-app/models"
@@ -27,23 +26,22 @@ func (uDAO *FoodDAO) AddFood(food models.Food) (id interface{}, err error){
 
 	if err == nil {id = res.InsertedID}
 
-	uDAO.config.Disconnect()
+	defer uDAO.config.Disconnect()
 	return
 }
 
-func (uDAO *FoodDAO) RemoveFood(_id string) (err error){
+func (uDAO *FoodDAO) RemoveFood(food models.Food) (err error){
 	uDAO.config = config.Config{}
 	db, err := uDAO.config.Connect()
 	if err != nil {
 		return
 	}
 
-	fmt.Println(_id)
-	filter := bson.M{"_id": _id}
+	filter := bson.M{"id": food.Id}
 	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
 	db.Collection(uDAO.Collection).FindOneAndDelete(ctx,filter)
 
-	uDAO.config.Disconnect()
+	defer uDAO.config.Disconnect()
 	return
 }
 
@@ -58,21 +56,22 @@ func (uDAO *FoodDAO) UpdateFood(food models.Food) (err error){
 	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
 	db.Collection(uDAO.Collection).FindOneAndReplace(ctx,filter,food)
 
-	uDAO.config.Disconnect()
+	defer uDAO.config.Disconnect()
 	return
 }
 
 func (uDAO *FoodDAO) GetFoods() (foods []models.Food, err error){
 	uDAO.config = config.Config{}
 	db, err := uDAO.config.Connect()
+
 	if err != nil {
 		return
 	}
 
 	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
 
-
 	cur, err := db.Collection(uDAO.Collection).Find(ctx, bson.D{})
+
 	if err != nil { return }
 
 	for cur.Next(ctx) {
@@ -87,8 +86,7 @@ func (uDAO *FoodDAO) GetFoods() (foods []models.Food, err error){
 	}
 
 	_ = cur.Close(ctx)
-
-	uDAO.config.Disconnect()
+	defer uDAO.config.Disconnect()
 	return
 }
 
@@ -119,7 +117,7 @@ func (uDAO *FoodDAO) GetFoodsByUser(userUid string) (foods []models.Food, err er
 
 	_ = cur.Close(ctx)
 
-	uDAO.config.Disconnect()
+	defer uDAO.config.Disconnect()
 	return
 }
 
@@ -156,6 +154,6 @@ func (uDAO *FoodDAO) GetFoodsByDate(t string) (foods []models.Food, err error){
 		return
 	}
 
-	uDAO.config.Disconnect()
+	defer uDAO.config.Disconnect()
 	return
 }

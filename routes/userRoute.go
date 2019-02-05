@@ -44,6 +44,22 @@ var UserRouter = models.Route{
 			}
 		})
 
+		app.Handle("POST", "/users/update", func(ctx iris.Context) {
+
+			var user models.User
+			err := ctx.ReadJSON(&user)
+			if err != nil {
+				ctx.StatusCode(400)
+			} else {
+				err := userController.UpdateToken(user)
+				if err != nil {
+					ctx.StatusCode(500)
+				} else {
+					ctx.StatusCode(200)
+				}
+			}
+		})
+
 		app.Handle("GET", "/user/{uid}", func(ctx iris.Context) {
 			userUid := ctx.Params().Get("uid")
 			user , err := userController.GetUserById(userUid)

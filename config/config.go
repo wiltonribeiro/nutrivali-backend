@@ -4,7 +4,6 @@ import (
 	"context"
 	"github.com/BurntSushi/toml"
 	"github.com/mongodb/mongo-go-driver/mongo"
-	"log"
 	"time"
 )
 
@@ -25,10 +24,11 @@ func read(config *Config) error {
 func (c *Config) Connect() (*mongo.Database, error){
 	err := read(c)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
+
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
-	client, err = mongo.Connect(ctx, c.Server)
+	client, err := mongo.Connect(ctx, c.Server)
 	var database = client.Database(c.Database)
 	return database, err
 }

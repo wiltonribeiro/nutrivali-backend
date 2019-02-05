@@ -25,7 +25,7 @@ func (uDAO *UserDAO) AddUser(user models.User) (id interface{}, err error){
 	res, err := db.Collection(uDAO.Collection).InsertOne(ctx, user)
 	id = res.InsertedID
 
-	uDAO.config.Disconnect()
+	defer uDAO.config.Disconnect()
 	return
 }
 
@@ -55,7 +55,7 @@ func (uDAO *UserDAO) GetUsers() (users []models.User, err error){
 
 	_ = cur.Close(ctx)
 
-	uDAO.config.Disconnect()
+	defer uDAO.config.Disconnect()
 	return
 }
 
@@ -70,13 +70,31 @@ func (uDAO *UserDAO) GetUserById(uid string) (user models.User, err error){
 
 
 	filter := bson.M{"auth_uid": uid}
-	ctx, _ = context.WithTimeout(context.Background(), 5*time.Second)
+
 	err = db.Collection(uDAO.Collection).FindOne(ctx, filter).Decode(&user)
 	if err != nil {
 		return
 	}
 
-	uDAO.config.Disconnect()
+	defer uDAO.config.Disconnect()
+	return
+}
+
+func (uDAO *UserDAO) UpdateUserToken(user models.User) (err error){
+	uDAO.config = config.Config{}
+	db, err := uDAO.config.Connect()
+	if err != nil {
+		return
+	}
+
+	filter := bson.M{"auth_uid": user.AuthUid}
+	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
+	var ai = db.Collection(uDAO.Collection).FindOneAndReplace(ctx,filter,user)
+	if ai.Err() != nil {
+		return ai.Err()
+	}
+
+	defer uDAO.config.Disconnect()
 	return
 }
 
