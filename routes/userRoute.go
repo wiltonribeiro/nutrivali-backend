@@ -12,7 +12,15 @@ var UserRouter = models.Route{
 		var userController = controllers.UserController{}
 
 		app.Handle("GET", "/", func(ctx iris.Context) {
-			_, _ = ctx.HTML("<p>TUDO OK</p>")
+
+			//controller := controllers.NotificationController{}
+			//err := controller.RequestNotify()
+			//if err!=nil {
+			//	_,_ = ctx.HTML(err.Error())
+			//} else {
+				_,_ = ctx.HTML("<p>RODANDO EM 22 HORAS</p>")
+			//}
+
 		})
 
 		app.Handle("GET", "/users", func(ctx iris.Context) {

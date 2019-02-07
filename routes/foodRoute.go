@@ -24,9 +24,18 @@ var FoodRoute = models.Route{
 			}
 		})
 
-		app.Handle("GET", "foods/date/{date}", func(ctx iris.Context) {
+		app.Handle("POST", "foods/date", func(ctx iris.Context) {
 
-			foods, err := foodController.GetFoodsByDate(ctx.Params().Get("date"))
+			var value = struct {
+				Date string `json:"date"`
+			}{}
+
+			_ = ctx.ReadJSON(&value)
+
+			foods, err := foodController.GetFoodsByDate(value.Date)
+			if err != nil {
+				print(err.Error())
+			}
 
 			if (err != nil && err.Error() == "mongo: no documents in result") || len(foods) == 0 {
 				ctx.StatusCode(404)

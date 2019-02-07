@@ -123,7 +123,7 @@ func (uDAO *FoodDAO) GetFoodsByUser(userUid string) (foods []models.Food, err er
 
 
 
-func (uDAO *FoodDAO) GetFoodsByDate(t string) (foods []models.Food, err error){
+func (uDAO *FoodDAO) GetFoodsByDate(today string, yesterday string) (foods []models.Food, err error){
 	uDAO.config = config.Config{}
 	db, err := uDAO.config.Connect()
 	if err != nil {
@@ -131,11 +131,18 @@ func (uDAO *FoodDAO) GetFoodsByDate(t string) (foods []models.Food, err error){
 	}
 
 	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
+	//filter := bson.M{"limit_date": t}
+	filter := bson.D{
+		{"$or",
+			bson.A{
+				bson.M{"limit_date": today},
+				bson.M{"limit_date": yesterday},
+			}},
+	}
 
+	cur, err := db.Collection(uDAO.Collection).Find(ctx, filter)
 
-	filter := bson.M{"limit_date": t}
-	ctx, _ = context.WithTimeout(context.Background(), 5*time.Second)
-	cur,err := db.Collection(uDAO.Collection).Find(ctx, filter)
+	if err != nil { return }
 
 	for cur.Next(ctx) {
 		var food models.Food

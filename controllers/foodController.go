@@ -21,7 +21,7 @@ func (u *FoodController) GetFoods() ([]models.Food, error){
 
 func (u *FoodController) GetFoodsByDate(time string) ([]models.Food, error){
 	u.dao = DAOs.FoodDAO{Collection: "foods"}
-	return u.dao.GetFoodsByDate(time)
+	return u.dao.GetFoodsByDate(time, time)
 }
 
 func (u *FoodController) GetFoodsByUser(uid string) ([]models.Food, error){
