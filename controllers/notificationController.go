@@ -32,24 +32,35 @@ func (n *NotificationController) RequestNotify() (err error) {
 			return erro
 		}
 
-		err = n.notify(food, user.Token)
+		err = n.notify(food, user)
 
 	}
 
 	return
 }
 
-func (n *NotificationController) notify(food models.Food, token string) (err error) {
+func (n *NotificationController) notify(food models.Food, user models.User) (err error) {
 
 
 	c := config.Config{}
 	serverKey, _ := c.GetKey()
 
+	var message string
+	var title string
+
+	if user.Lang == "pt" {
+		message = fmt.Sprintf("O seu alimento %v vencerá na data %v. Esteja atento, abraços.", food.Description, food.LimitDate)
+		title = "Olá, preciso te falar algo"
+	} else {
+		message = fmt.Sprintf("Your food %v vencerá na data %v. Esteja atento, abraços.", food.Description, food.LimitDate)
+		title = "Olá, preciso te falar algo"
+	}
+
 	msg := &fcm.Message{
-		To: token,
+		To: user.Token,
 		Notification: &fcm.Notification{
-			Body: fmt.Sprintf("O seu alimento %v vencerá na data %v. Esteja atento, abraços.", food.Description, food.LimitDate),
-			Title: "Olá, preciso te falar algo",
+			Body: message,
+			Title: title,
 			Sound: "default",
 		},
 		Data: map[string]interface{}{
