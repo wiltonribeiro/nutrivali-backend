@@ -16,7 +16,7 @@ func main() {
 				fmt.Println(err.Error())
 			}
 			fmt.Printf("rodou já %v", time.Now().String())
-			time.Sleep(time.Hour*22)
+			time.Sleep(time.Hour*24)
 		}
 	}()
 	

@@ -48,12 +48,17 @@ func (n *NotificationController) notify(food models.Food, user models.User) (err
 	var message string
 	var title string
 
-	if user.Lang == "pt" {
+	if user.Lang != "pt" {
 		message = fmt.Sprintf("O seu alimento %v vencerá na data %v. Esteja atento, abraços.", food.Description, food.LimitDate)
 		title = "Olá, preciso te falar algo"
 	} else {
-		message = fmt.Sprintf("Your food %v vencerá na data %v. Esteja atento, abraços.", food.Description, food.LimitDate)
-		title = "Olá, preciso te falar algo"
+
+		t, err := time.Parse("02/01/2006", food.LimitDate)
+		if err != nil {
+			fmt.Println(err.Error())
+		}
+		message = fmt.Sprintf("Your food %v will be outdated %v. Be aware and don't forget :)", food.Description, t.Format("01/02/2006"))
+		title = "Hey, i need to tell you something"
 	}
 
 	msg := &fcm.Message{

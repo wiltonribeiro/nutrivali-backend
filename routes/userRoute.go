@@ -18,7 +18,7 @@ var UserRouter = models.Route{
 			//if err!=nil {
 			//	_,_ = ctx.HTML(err.Error())
 			//} else {
-				_,_ = ctx.HTML("<p>RODANDO EM 22 HORAS</p>")
+				_,_ = ctx.HTML("<p>RODANDO EM 24 HORAS</p>")
 			//}
 
 		})
