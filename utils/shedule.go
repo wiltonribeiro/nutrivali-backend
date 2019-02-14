@@ -1,25 +1,33 @@
 package utils
 
+import (
+	"fmt"
+	"time"
+)
+
 type task func()
 
-func schedule(hours int, minutes int, t task) chan int {
-	var normalized = false
+var normalized = false
+
+func Schedule(hours int, minutes int, task task) chan int {
 	for{
-		if normalized{
-			t()
-			time.Sleep(time.Second*10)
+		if normalized {
+			task()
+			time.Sleep(time.Hour*12)
 		} else {
 			t := time.Now().Add(time.Hour*24)
-			day := t.Day()
+			day := fmt.Sprintf("%02d", t.Day())
 			month := fmt.Sprintf("%02d", int(t.Month()))
 			year := t.Year()
-			timeToTaskString := fmt.Sprintf("%v-%v-%v %v:%v UTC", year, month, day, hours, minutes)
+			h := fmt.Sprintf("%02d", hours)
+			m := fmt.Sprintf("%02d", minutes)
+			timeToTaskString := fmt.Sprintf("%v-%v-%v %v:%v UTC", year, month, day, h, m)
 			timeToTask, _ := time.Parse("2006-01-02 15:04 MST", timeToTaskString)
 			delta := time.Now().Sub(timeToTask)
 			valueToWait := -1 *(delta.Minutes() - (3*time.Hour.Minutes()))
 			duration := time.Minute*time.Duration(valueToWait)
+			UpdateLog("waiting", duration.String())
 			time.Sleep(duration)
-			fmt.Printf("Sai do sleep as %v", time.Now().String())
 			normalized = true
 		}
 	}

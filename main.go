@@ -1,11 +1,22 @@
 package main
 
 import (
-	"fmt"
 	"go-app/controllers"
 	"go-app/server"
+	"go-app/utils"
 	"time"
 )
+
+//para testar depois
+func notificationSystem() {
+	controller := controllers.NotificationController{}
+	err := controller.RequestNotify()
+	if err!=nil {
+		utils.UpdateLog(err.Error(),time.Now().String())
+	} else {
+		utils.UpdateLog("running well", time.Now().String())
+	}
+}
 
 func main() {
 	go func() {
@@ -13,13 +24,14 @@ func main() {
 			controller := controllers.NotificationController{}
 			err := controller.RequestNotify()
 			if err!=nil {
-				fmt.Println(err.Error())
+				utils.UpdateLog(err.Error(),time.Now().String())
+			} else {
+				utils.UpdateLog("running well", time.Now().String())
 			}
-			fmt.Printf("rodou já %v", time.Now().String())
-			time.Sleep(time.Hour*24)
+
+			time.Sleep(time.Hour*12)
 		}
 	}()
-	
 	server.InitServer()
 }
 

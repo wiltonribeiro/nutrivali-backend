@@ -4,6 +4,7 @@ import (
 	"github.com/kataras/iris"
 	"go-app/controllers"
 	"go-app/models"
+	"go-app/utils"
 )
 
 var UserRouter = models.Route{
@@ -12,15 +13,7 @@ var UserRouter = models.Route{
 		var userController = controllers.UserController{}
 
 		app.Handle("GET", "/", func(ctx iris.Context) {
-
-			//controller := controllers.NotificationController{}
-			//err := controller.RequestNotify()
-			//if err!=nil {
-			//	_,_ = ctx.HTML(err.Error())
-			//} else {
-				_,_ = ctx.HTML("<p>RODANDO EM 24 HORAS</p>")
-			//}
-
+			_,_ = ctx.JSON(utils.GetLog())
 		})
 
 		app.Handle("GET", "/users", func(ctx iris.Context) {
