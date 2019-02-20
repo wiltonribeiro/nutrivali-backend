@@ -7,13 +7,13 @@ import (
 	"time"
 )
 
+var DB *mongo.Database = nil
+
 type Config struct {
 	Server   string
 	Database string
 	Key string
 }
-
-var client *mongo.Client = nil
 
 func read(config *Config) error {
 	if _, err := toml.DecodeFile("config.toml", &config); err != nil {
@@ -31,7 +31,16 @@ func (c *Config) GetKey() (key string, err error){
 	return
 }
 
-func (c *Config) Connect() (*mongo.Database, error){
+func (c *Config) InitDB() (err error) {
+	DB , err = c.connect()
+	if err != nil {
+		return
+	}
+
+	return
+}
+
+func (c *Config) connect() (*mongo.Database, error){
 	err := read(c)
 	if err != nil {
 		return nil, err
@@ -40,11 +49,13 @@ func (c *Config) Connect() (*mongo.Database, error){
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	client, err := mongo.Connect(ctx, c.Server)
 	var database = client.Database(c.Database)
+
 	return database, err
 }
 
-func (c *Config) Disconnect() {
-	if client != nil {
-		_ = client.Disconnect(context.Background())
+
+func (c *Config) CloseDB() {
+	if DB.Client() != nil {
+		_ = DB.Client().Disconnect(context.Background())
 	}
 }

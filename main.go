@@ -1,37 +1,34 @@
 package main
 
 import (
-	"go-app/controllers"
+	"go-app/config"
 	"go-app/server"
+	"go-app/services"
 	"go-app/utils"
 	"time"
 )
 
-//para testar depois
-func notificationSystem() {
-	controller := controllers.NotificationController{}
-	err := controller.RequestNotify()
+func notify(){
+	service := services.NotificationService{}
+	err := service.RequestNotify()
 	if err!=nil {
 		utils.UpdateLog(err.Error(),time.Now().String())
 	} else {
-		utils.UpdateLog("running well", time.Now().String())
+		utils.UpdateLog("waiting next request", time.Now().String())
 	}
 }
 
 func main() {
-	go func() {
-		for {
-			controller := controllers.NotificationController{}
-			err := controller.RequestNotify()
-			if err!=nil {
-				utils.UpdateLog(err.Error(),time.Now().String())
-			} else {
-				utils.UpdateLog("running well", time.Now().String())
-			}
+	go utils.ScheduleByTime("10:00", notify)
+	go utils.ScheduleByTime("20:00", notify)
 
-			time.Sleep(time.Hour*12)
-		}
-	}()
-	server.InitServer()
+	c := config.Config{}
+
+	if err := c.InitDB(); err == nil || config.DB != nil {
+		server.InitServer()
+	}
+
+	defer c.CloseDB()
+
 }
 

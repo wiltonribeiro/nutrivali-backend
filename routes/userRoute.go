@@ -16,63 +16,14 @@ var UserRouter = models.Route{
 			_,_ = ctx.JSON(utils.GetLog())
 		})
 
-		app.Handle("GET", "/users", func(ctx iris.Context) {
-			users , err := userController.GetUsers()
+		app.Handle("GET", "/users", userController.GetUsers)
 
-			if err != nil && err.Error() == "mongo: no documents in result" {
-				ctx.StatusCode(404)
-			} else if err != nil {
-				ctx.StatusCode(500)
-			} else {
-				_, _ = ctx.JSON(users)
-			}
-		})
+		app.Handle("POST", "/users", userController.AddUser)
 
+		app.Handle("POST", "/users/update", userController.UpdateToken)
 
-		app.Handle("POST", "/users", func(ctx iris.Context) {
+		app.Handle("GET", "/user/{uid}", userController.GetUserById)
 
-			var user models.User
-			err := ctx.ReadJSON(&user)
-			if err != nil {
-				ctx.StatusCode(400)
-			} else {
-				_, err := userController.AddUser(user)
-				if err != nil {
-					ctx.StatusCode(500)
-				} else {
-					ctx.StatusCode(200)
-				}
-			}
-		})
-
-		app.Handle("POST", "/users/update", func(ctx iris.Context) {
-
-			var user models.User
-			err := ctx.ReadJSON(&user)
-			if err != nil {
-				ctx.StatusCode(400)
-			} else {
-				err := userController.UpdateToken(user)
-				if err != nil {
-					ctx.StatusCode(500)
-				} else {
-					ctx.StatusCode(200)
-				}
-			}
-		})
-
-		app.Handle("GET", "/user/{uid}", func(ctx iris.Context) {
-			userUid := ctx.Params().Get("uid")
-			user , err := userController.GetUserById(userUid)
-
-			if err != nil && err.Error() == "mongo: no documents in result" {
-				ctx.StatusCode(404)
-			} else if err != nil {
-				ctx.StatusCode(500)
-			} else {
-				_, _ = ctx.JSON(user)
-			}
-		})
 	},
 }
 

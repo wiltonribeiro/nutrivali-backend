@@ -1,22 +1,22 @@
-package controllers
+package services
 
 import (
 	"fmt"
 	"github.com/appleboy/go-fcm"
-	"go-app/DAOs"
+	"go-app/repositories"
 	"go-app/config"
 	"go-app/models"
 	"time"
 )
 
-type NotificationController struct {
-	daoFood DAOs.FoodDAO
-	daoUser DAOs.UserDAO
+type NotificationService struct {
+	daoFood repositories.FoodRepository
+	daoUser repositories.UserRepository
 }
 
-func (n *NotificationController) RequestNotify() (err error) {
-	n.daoFood = DAOs.FoodDAO{Collection: "foods"}
-	n.daoUser = DAOs.UserDAO{Collection: "users"}
+func (n *NotificationService) RequestNotify() (err error) {
+	n.daoFood = repositories.FoodRepository{Collection: "foods"}
+	n.daoUser = repositories.UserRepository{Collection: "users"}
 
 	dateStrToday := time.Now().Format("02/01/2006")
 	dateStrYesterday := time.Now().Add(24*time.Hour).Format("02/01/2006")
@@ -27,9 +27,9 @@ func (n *NotificationController) RequestNotify() (err error) {
 	}
 
 	for _, food := range foods {
-		user, erro := n.daoUser.GetUserById(food.UserUid)
-		if erro != nil {
-			return erro
+		user, err1 := n.daoUser.GetUserById(food.UserUid)
+		if err1 != nil {
+			return err1
 		}
 
 		err = n.notify(food, user)
@@ -39,8 +39,7 @@ func (n *NotificationController) RequestNotify() (err error) {
 	return
 }
 
-func (n *NotificationController) notify(food models.Food, user models.User) (err error) {
-
+func (n *NotificationService) notify(food models.Food, user models.User) (err error) {
 
 	c := config.Config{}
 	serverKey, _ := c.GetKey()
@@ -48,11 +47,10 @@ func (n *NotificationController) notify(food models.Food, user models.User) (err
 	var message string
 	var title string
 
-	if user.Lang != "pt" {
+	if user.Lang == "pt" {
 		message = fmt.Sprintf("O seu alimento %v vencerá na data %v. Esteja atento, abraços.", food.Description, food.LimitDate)
 		title = "Olá, preciso te falar algo"
 	} else {
-
 		t, err := time.Parse("02/01/2006", food.LimitDate)
 		if err != nil {
 			fmt.Println(err.Error())

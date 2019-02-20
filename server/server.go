@@ -17,7 +17,7 @@ func applyRoutes(routes []models.Route){
 }
 
 func InitServer(){
-	var r = []models.Route{
+	var r = []models.Route {
 		routes.UserRouter,
 		routes.FoodRoute,
 	}
