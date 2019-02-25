@@ -18,6 +18,7 @@ func applyRoutes(routes []models.Route){
 
 func InitServer(){
 	var r = []models.Route {
+		routes.NewsRoute,
 		routes.UserRouter,
 		routes.FoodRoute,
 	}

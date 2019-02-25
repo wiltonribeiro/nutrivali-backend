@@ -15,6 +15,5 @@ func GetLog() models.Log {
 	if log == nil {
 		return models.Log{Content: "waiting to start", Date: time.Now().String()}
 	}
-
 	return *log
 }

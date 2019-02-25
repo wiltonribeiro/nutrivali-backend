@@ -19,8 +19,8 @@ func notify(){
 }
 
 func main() {
-	go utils.ScheduleByTime("10:00", notify)
-	go utils.ScheduleByTime("20:00", notify)
+	//go utils.ScheduleByTime("10:00", notify)
+	//go utils.ScheduleByTime("20:00", notify)
 
 	c := config.Config{}
 
