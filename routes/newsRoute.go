@@ -11,7 +11,7 @@ var NewsRoute = models.Route{
 
 		var newsController = controllers.NewsController{}
 
-		app.Handle("GET", "news/{lang}/{page}", newsController.GetNews)
+		app.Handle("GET", "news/{lang}/{page}", newsController.GetNewsArticles)
 
 	},
 }
