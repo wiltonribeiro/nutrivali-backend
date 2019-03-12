@@ -1,7 +1,7 @@
 package models
 
 type Log struct {
-	Date string `json:"date"`
+	Value string `json:"value"`
 	Content string `json:"content"`
 }
 

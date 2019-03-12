@@ -5,6 +5,7 @@ import (
 	"github.com/mongodb/mongo-go-driver/bson"
 	"go-app/config"
 	"go-app/models"
+	"sort"
 	"time"
 )
 
@@ -12,19 +13,19 @@ type NewsRepository struct {
 	Collection string
 }
 
-//bson.M{ "_id" : 0, "articles" : bson.M{ "$slice": bson.A{"$articles", bson.M{"$subtract": bson.A{bson.M{"$size": "$articles"}, 20}}, bson.M{"$subtract": bson.A{bson.M{"$size": "$articles"}, 20}}}}},
-
 func (repo *NewsRepository) GetNewsArticles(lang string, page int) (articles []models.Article, err error){
 
 	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
 
-	end := (10 * page) * -1
+	count := 30
+
+	end := (count * page) * -1
 
 	pipeline := []bson.M{
 		{"$match": bson.M{"language": lang }},
 		{"$project" :
 			bson.M{ "_id" : 0, "articles" : bson.M{
-				"$cond": bson.M{ "if" : bson.M{ "$gte": bson.A{ bson.M{ "$size": "$articles"}, end * -1 } }, "then" : bson.M { "$slice": bson.A{"$articles", end, 10} }, "else": bson.A{} },
+				"$cond": bson.M{ "if" : bson.M{ "$gte": bson.A{ bson.M{ "$size": "$articles"}, end * -1 } }, "then" : bson.M { "$slice": bson.A{"$articles", end, count} }, "else": bson.A{} },
 			}},
 
 		},
@@ -58,9 +59,29 @@ func (repo *NewsRepository) GetNewsArticles(lang string, page int) (articles []m
 		return
 	}
 
-	articles = structure["articles"]
+	articles = sortArticles(structure["articles"])
 
 	return
+}
+
+func sortArticles(articles []models.Article) []models.Article{
+	sort.SliceStable(articles, func(i, j int) bool {
+
+		ai, aj := articles[i], articles[j]
+
+
+		t1, _ := time.Parse(time.RFC3339Nano, ai.PublishedAt)
+		t2, _ := time.Parse(time.RFC3339Nano, aj.PublishedAt)
+
+		switch {
+		case t1.After(t2):
+			return true
+		default:
+			return false
+		}
+	})
+
+	return articles
 }
 
 

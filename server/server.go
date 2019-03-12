@@ -7,9 +7,10 @@ import (
 )
 
 func applyRoutes(routes []models.Route){
+
 	app := iris.Default()
 
-	for _,item := range routes{
+	for _,item := range routes {
 		item.Apply(app)
 	}
 
@@ -21,6 +22,7 @@ func InitServer(){
 		routes.NewsRoute,
 		routes.UserRouter,
 		routes.FoodRoute,
+		routes.NotificationRoute,
 	}
 	applyRoutes(r)
 }

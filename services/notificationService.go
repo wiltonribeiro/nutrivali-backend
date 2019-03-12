@@ -14,7 +14,7 @@ type NotificationService struct {
 	daoUser repositories.UserRepository
 }
 
-func (n *NotificationService) RequestNotify() (err error) {
+func (n *NotificationService) RequestNotify() (count int, err error) {
 	n.daoFood = repositories.FoodRepository{Collection: "foods"}
 	n.daoUser = repositories.UserRepository{Collection: "users"}
 
@@ -29,12 +29,15 @@ func (n *NotificationService) RequestNotify() (err error) {
 	for _, food := range foods {
 		user, err1 := n.daoUser.GetUserById(food.UserUid)
 		if err1 != nil {
-			return err1
+			err = err1
+			return
 		}
 
 		err = n.notify(food, user)
 
 	}
+
+	count = len(foods)
 
 	return
 }
